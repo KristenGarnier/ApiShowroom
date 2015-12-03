@@ -10,7 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.14.1",
+    "connect-multiparty": "^2.0.0",
+    "eslint": "^1.10.3",
     "express": "^4.13.3",
+    "ftp": "^0.3.10",
+    "ftp-client": "^0.2.2",
+    "imagemin": "^4.0.0",
+    "imageoptim": "^0.4.1",
     "locallydb": "0.0.9",
     "morgan": "^1.6.1",
     "multer": "^1.1.0",

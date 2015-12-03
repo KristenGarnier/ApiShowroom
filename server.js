@@ -11,8 +11,14 @@ var app = express(); // define our app using express
 var bodyParser = require('body-parser'); // get body-parser
 var morgan = require('morgan'); // used to see request
 var port = process.env.PORT || 8080; // set the port for our app
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
+var imageUpload = require('./imageUpload');
+
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 var superSecret = "mahnameiskristenandifuckingrocks"; // variable secrète pour les tokens
+
 
 // APP CONFIGURATION -------------
 // use body parser so we can grab information from POST requests
@@ -39,46 +45,83 @@ var apiRouter = express.Router();
 
 // basic route for the home page
 
+apiRouter.route('/')
+    .get(function (req, res) {
+        res.sendfile('index.html');
+    });
+
 apiRouter.route('/users')
     .get(function (req, res) {
-        var fiveLast = users.items.reverse().map(function(item, index){
-            if(index < 5){
+        var fiveLast = users.items.reverse().filter(function (item, index) {
+            if (index < 5) {
                 return item;
             }
         });
         res.send(fiveLast);
     })
-    .post(function (req, res) {
-
-        if(users.where({username : req.body.username}).items.length > 0 ){
+    .post(multipartMiddleware, function (req, res, next) {
+        var user, newPath, file;
+        if (users.where({username: req.body.username}).items.length > 0) {
             res.status(409).send({
-                error : true,
-                message : "The user already exists"
+                error: true,
+                message: "The user already exists"
+            });
+        } else {
+            user = users.insert(
+                {
+                    username: req.body.username,
+                    imageweb: null,
+                    imagegraph: null,
+                    imageaudio: null,
+                    portrait: null
+                }
+            );
+
+            if (req.files) {
+                imageUpload.upload(req.files.avatar, user, function(file, user){
+                    users.update(user, {portrait: file});
+                });
+            }
+
+            res.status(200).send({
+                error: false,
+                message: ""
             });
         }
-
-        users.insert(
-            {
-                username: req.body.username,
-                imageweb: null,
-                imagegraph: null,
-                imageaudio: null,
-                portrait: null
-            }
-        );
-
-        res.status(200).send({
-            error: false,
-            message: ""
-        });
     });
 
 apiRouter.route('/users/:id')
     .get(function (req, res) {
-        User.findById(req.params.id)
-            .then(function (user) {
-                res.send(user);
-            })
+        res.send(users.get(parseInt(req.params.id)));
+    })
+    .patch(function (req, res) {
+        var id = parseInt(req.params.id);
+        users.update(id, req.body.change);
+        res.send(users.get(id));
+    })
+    .post(function (req, res) {
+        var id = parseInt(req.params.id),
+            type = req.body.type, user;
+
+        user = users.get(id);
+        res.send({
+            user: user,
+            id: id,
+            type: req.body.type
+        });
+        imageUpload.upload(req.files, user, users, function() {
+            switch(type){
+                case 'audiovisuel':
+                    users.update(user, {"imageaudio": file});
+                    break;
+                case 'infographie':
+                    users.update(user, {"imagegraph": file});
+                    break;
+                case 'web':
+                    users.update(user, {"imageweb": file});
+                    break;
+            }
+        });
     });
 
 app.use('/', apiRouter);
