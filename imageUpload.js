@@ -2,10 +2,10 @@ var fs = require('fs');
 var imageOptim = require('imageoptim');
 
 module.exports = {
-    upload: function (file, user, cb) {
+    upload: function (filebag, user, cb) {
         var newPath, file;
-        fs.readFile(file.path, function (err, data) {
-            file = "/uploads/" + user + file.name;
+        fs.readFile(filebag.path, function (err, data) {
+            file = "/uploads/" + user + filebag.name;
             newPath = __dirname + file;
             fs.writeFile(newPath, data, function (err) {
                 if (err) {
@@ -19,7 +19,7 @@ module.exports = {
                             console.log(res);
                         })
                         .done(function () {
-                            cb(file, user);
+                            cb(file, user, newPath, filebag);
                         });
                 }
             });

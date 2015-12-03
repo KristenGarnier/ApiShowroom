@@ -14,6 +14,7 @@ var port = process.env.PORT || 8080; // set the port for our app
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 var imageUpload = require('./imageUpload');
+var ftp = require('./ftp');
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
@@ -109,16 +110,22 @@ apiRouter.route('/users/:id')
             id: id,
             type: req.body.type
         });
-        imageUpload.upload(req.files, user, users, function() {
+        imageUpload.upload(req.files, user, users, function(user, file, newpath, fileObj) {
             switch(type){
                 case 'audiovisuel':
                     users.update(user, {"imageaudio": file});
+                    ftp.upload('audiovisuel',newpath, fileObj);
                     break;
                 case 'infographie':
                     users.update(user, {"imagegraph": file});
+                    ftp.upload('infographie',newpath, fileObj);
                     break;
                 case 'web':
                     users.update(user, {"imageweb": file});
+                    ftp.upload('web',newpath, fileObj);
+                    break;
+                default:
+                    throw 'Impossible de tirer le type de l\'image';
                     break;
             }
         });
