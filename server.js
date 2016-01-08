@@ -1,9 +1,9 @@
 // BASE SETUP
 // ===============================
 
-var db = require('locallydb');
-var db = new db('./data');
-var users = db.collection('users');
+var db = require('locallydb'),
+    db = new db('./data'),
+    users = db.collection('users');
 
 // CALL THE PACKAGES -------------
 var express = require('express'); // call express
@@ -15,8 +15,10 @@ var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 var imageUpload = require('./imageUpload');
 var ftp = require('./ftp');
-var request = require('superagent');
 var moment = require('moment');
+var uploadTreatment = require('./uploadTreatment');
+var objectAssign = require('object-assign');
+var cors = require('cors');
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
@@ -27,6 +29,7 @@ var superSecret = "mahnameiskristenandifuckingrocks"; // variable secrète pour 
 // use body parser so we can grab information from POST requests
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(cors());
 
 var done = false; // To send res only when upload is done
 
@@ -105,50 +108,47 @@ apiRouter.route('/users/:id')
     })
     .post(multipartMiddleware, function (req, res) {
         var id = parseInt(req.params.id),
-            type = req.body.type, user, date = moment();
+            type = req.body.type, user, date = moment(), params;
 
         user = users.get(id);
         imageUpload.upload(req.files, user.cid, function (user, file, newpath, fileObj) {
+            params = {
+                id: id,
+                user: user,
+                newpath: newpath,
+                fileObj: fileObj,
+                date: date,
+                users: users,
+                cat: type
+            };
+
             switch (type) {
                 case 'audiovisuel':
-                    users.update(users.get(id).cid, {"imageaudio": user});
-                    ftp.upload("audiovisuel", newpath, fileObj, user);
-                    request
-                        .post("http://showroom.mmi-lepuy.fr/API/ajouterRealisation.php?titre=upload%20from%20server&catid=4&auteur=" + users.get(id).username + "&dateP=" + date.format('DD-MM-YYYY') + "&url=" + fileObj.upload.name)
-                        .end(function (err, response) {
-                            if (err) {
-                                console.log("ERROR");
-                            } else {
-                                res.send(response);
-                            }
-                        });
+                    uploadTreatment(objectAssign(params, {imageCat: 'imageaudio', catId: 4}), function (err, response) {
+                        if (err) {
+                            console.log("ERROR");
+                        } else {
+                            res.send(response);
+                        }
+                    });
                     break;
                 case 'infographie':
-                    users.update(users.get(id).cid, {"imagegraph": user});
-                    ftp.upload("infographie", newpath, fileObj, user);
-                    request
-                        .post("http://showroom.mmi-lepuy.fr/API/ajouterRealisation.php?titre=upload%20from%20server&catid=3&auteur=" + user.username + "&dateP=" + date.format('DD-MM-YYYY') + "&url=" + fileObj.upload.name)
-                        .end(function (err, response) {
-                            if (err) {
-                                console.log("ERROR");
-                            } else {
-                                res.send(response);
-                            }
-                        });
+                    uploadTreatment(objectAssign(params, {imageCat: 'imagegraph', catId: 3}), function (err, response) {
+                        if (err) {
+                            console.log("ERROR");
+                        } else {
+                            res.send(response);
+                        }
+                    });
                     break;
                 case 'web':
-                    users.update(users.get(id).cid, {"imageweb": user});
-                    console.log(fileObj.upload.name);
-                    ftp.upload("web", newpath, fileObj, user);
-                    request
-                        .post("http://showroom.mmi-lepuy.fr/API/ajouterRealisation.php?titre=upload%20from%20server&catid=2&auteur=" + user.username + "&dateP=" + date.format('DD-MM-YYYY') + "&url=" + fileObj.upload.name)
-                        .end(function (err, response) {
-                            if (err) {
-                                console.log("ERROR");
-                            } else {
-                                res.send(response);
-                            }
-                        });
+                    uploadTreatment(objectAssign(params, {imageCat: 'imageweb', catId: 2}),  function (err, response) {
+                        if (err) {
+                            console.log("ERROR");
+                        } else {
+                            res.send(response);
+                        }
+                    });
                     break;
                 default:
                     throw 'Impossible de tirer le type de l\'image';
