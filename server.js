@@ -3,22 +3,22 @@
 
 var db = require('locallydb'),
     db = new db('./data'),
-    users = db.collection('users');
+    users = db.collection('users'),
 
 // CALL THE PACKAGES -------------
-var express = require('express'); // call express
-var app = express(); // define our app using express
-var bodyParser = require('body-parser'); // get body-parser
-var morgan = require('morgan'); // used to see request
-var port = process.env.PORT || 8080; // set the port for our app
-var multipart = require('connect-multiparty');
-var multipartMiddleware = multipart();
-var imageUpload = require('./imageUpload');
-var ftp = require('./ftp');
-var moment = require('moment');
-var uploadTreatment = require('./uploadTreatment');
-var objectAssign = require('object-assign');
-var cors = require('cors');
+    express = require('express'), // call express
+    app = express(), // define our app using express
+    bodyParser = require('body-parser'), // get body-parser
+    morgan = require('morgan'), // used to see request
+    port = process.env.PORT || 8080, // set the port for our app
+    multipart = require('connect-multiparty'),
+    multipartMiddleware = multipart(),
+    imageUpload = require('./imageUpload'),
+    ftp = require('./ftp'),
+    moment = require('moment'),
+    uploadTreatment = require('./uploadTreatment'),
+    objectAssign = require('object-assign'),
+    cors = require('cors');
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
@@ -142,7 +142,7 @@ apiRouter.route('/users/:id')
                     });
                     break;
                 case 'web':
-                    uploadTreatment(objectAssign(params, {imageCat: 'imageweb', catId: 2}),  function (err, response) {
+                    uploadTreatment(objectAssign(params, {imageCat: 'imageweb', catId: 2}), function (err, response) {
                         if (err) {
                             console.log("ERROR");
                         } else {
