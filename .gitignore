@@ -7,5 +7,5 @@
 *.iml
 out
 gen
-
+config/index.js
 node_modules

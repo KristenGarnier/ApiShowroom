@@ -1,6 +1,8 @@
 var apiEndPoint = require('./requestApi');
 var ftp = require('./ftp');
 
+// uploadTreatment :: Object -> fn
+// Abstract the user update, ftp upload, and api call
 module.exports = function(obj, fn) {
     var update = {};
     update['imageCat'] = obj.imageCat;

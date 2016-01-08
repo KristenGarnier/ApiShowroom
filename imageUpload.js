@@ -2,6 +2,8 @@ var fs = require('fs');
 var imageOptim = require('imageoptim');
 
 module.exports = {
+    // upload :: Object -> Number -> Function
+    // uplaod the image to the server and optimize if it's a png
     upload: function (filebag, user, cb) {
         var newPath, file,fileContent;
 
