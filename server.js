@@ -99,7 +99,7 @@ apiRouter.route('/users')
                 });
             }
 
-            res.status(200).send({
+            res.status(201).send({
                 error: false,
                 message: ""
             });
@@ -114,10 +114,12 @@ apiRouter.route('/users/:id')
 
     // update a user if needed
     // send updated user
+    // Must includes params :
+    // change: Object -> Données à changer sur l'utilisateur
     .patch(function (req, res) {
         var id = parseInt(req.params.id);
         users.update(id, req.body.change);
-        res.send(users.get(id));
+        res.status(204).send(users.get(id));
     })
     // upload a user image
     // Must includes params :
@@ -145,7 +147,7 @@ apiRouter.route('/users/:id')
                         if (err) {
                             console.log("ERROR");
                         } else {
-                            res.send(response);
+                            res.status(204).send(response);
                         }
                     });
                     break;
@@ -154,7 +156,7 @@ apiRouter.route('/users/:id')
                         if (err) {
                             console.log("ERROR");
                         } else {
-                            res.send(response);
+                            res.status(204).send(response);
                         }
                     });
                     break;
@@ -163,11 +165,15 @@ apiRouter.route('/users/:id')
                         if (err) {
                             console.log("ERROR");
                         } else {
-                            res.send(response);
+                            res.status(204).send(response);
                         }
                     });
                     break;
                 default:
+                    res.status(409).send({
+                        error: true,
+                        message: "Wrong type sent. Accepted ones : ['web', 'inforgraphie', 'audiovisuel']"
+                    });
                     throw 'Impossible de tirer le type de l\'image';
                     break;
             }
