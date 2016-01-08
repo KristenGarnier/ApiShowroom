@@ -4,7 +4,7 @@ Nodejs Api, using Express and localDb
 
 ## Api methods 
 
-
+### Fetch the last five users created in the DB
 ```
 GET /users
 
@@ -13,8 +13,8 @@ No params required
 
 Success code : 200
 ```
-Fetch the last five users created in the DB
 
+### Create a user in the db
 ```
 POST /users
 
@@ -25,8 +25,8 @@ username : String -> name of the user
 Success code : 201
 Error code : 409
 ```
-Create a user in the db
 
+### Get the user with the id :id
 ```
 get /users/:id
 
@@ -36,8 +36,8 @@ No params required
 Success code : 200
 Error code : 404
 ```
-Get the user with the id :id
 
+### Update the user with the id :id
 ```
 PATCH /users/:id
 
@@ -47,8 +47,8 @@ change : Object -> Changements sur l'utilisateur ex {username: 'yourstring'}
 Success code : 201
 Error code : 404
 ```
-Update the user with the id :id
 
+### Upload image to the server and update the user with the id :id
 ```
 POST /users/:id
 
@@ -59,7 +59,7 @@ type : String -> type of creation [possible values : ['audiovisuel', 'infographi
 Success code : 201
 Error code : 404
 ```
-Upload image to the server and update the user with the id :id
+
 
 ##ERROR FORMAT
 
