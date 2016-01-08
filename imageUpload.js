@@ -3,9 +3,15 @@ var imageOptim = require('imageoptim');
 
 module.exports = {
     upload: function (filebag, user, cb) {
-        var newPath, file;
-        fs.readFile(filebag.path, function (err, data) {
-            file = "/uploads/" + user + filebag.name;
+        var newPath, file,fileContent;
+
+        if(!filebag.path){
+            fileContent  = filebag.upload;
+        }else {
+            fileContent = filebag;
+        }
+        fs.readFile(fileContent.path, function (err, data) {
+            file = "/uploads/" + user + fileContent.name;
             newPath = __dirname + file;
             fs.writeFile(newPath, data, function (err) {
                 if (err) {

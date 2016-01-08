@@ -18,9 +18,11 @@
     "imagemin": "^4.0.0",
     "imageoptim": "^0.4.1",
     "locallydb": "0.0.9",
+    "moment": "^2.11.0",
     "morgan": "^1.6.1",
     "multer": "^1.1.0",
     "mysql": "^2.9.0",
-    "sequelize": "^3.13.0"
+    "sequelize": "^3.13.0",
+    "superagent": "^1.6.1"
   }
 }
